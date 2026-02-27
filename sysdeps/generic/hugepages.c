@@ -1,4 +1,4 @@
-/* Malloc huge Page support.  Generic implementation.
+/* Huge Page support.  Generic implementation.
    Copyright (C) 2021-2026 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -16,18 +16,16 @@
    License along with the GNU C Library; see the file COPYING.LIB.  If
    not, see <https://www.gnu.org/licenses/>.  */
 
-#include <malloc-hugepages.h>
+#include <hugepages.h>
 
 unsigned long int
-__malloc_default_thp_pagesize (void)
+__hugepages_default_thp_pagesize (void)
 {
   return 0;
 }
 
-/* Return the default transparent huge page size.  */
-void
-__malloc_hugepage_config (size_t requested, size_t *pagesize, int *flags)
+enum hugepages_thp_mode_t
+__hugepages_thp_mode (void)
 {
-  *pagesize = 0;
-  *flags = 0;
+  return hugepages_thp_mode_not_supported;
 }

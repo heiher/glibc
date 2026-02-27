@@ -32,9 +32,13 @@ endif
 endif
 
 ifeq ($(subdir),malloc)
-sysdep_malloc_debug_routines += malloc-hugepages
+sysdep_malloc_debug_routines += \
+  hugepages \
+  malloc-hugepages
 endif
 
 ifeq ($(subdir),misc)
-sysdep_routines += malloc-hugepages
+sysdep_routines += \
+  hugepages \
+  malloc-hugepages
 endif

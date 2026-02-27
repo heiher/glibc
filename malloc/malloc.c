@@ -1768,7 +1768,7 @@ struct malloc_par
   INTERNAL_SIZE_T arena_max;
 
   /* Transparent Large Page support.  */
-  enum malloc_thp_mode_t thp_mode;
+  enum hugepages_thp_mode_t thp_mode;
   INTERNAL_SIZE_T thp_pagesize;
   /* A value different than 0 means to align mmap allocation to hp_pagesize
      add hp_flags on flags.  */
@@ -1823,7 +1823,7 @@ static struct malloc_par mp_ =
   .trim_threshold = DEFAULT_TRIM_THRESHOLD,
 #define NARENAS_FROM_NCORES(n) ((n) * (sizeof (long) == 4 ? 2 : 8))
   .arena_test = NARENAS_FROM_NCORES (1),
-  .thp_mode = malloc_thp_mode_not_supported
+  .thp_mode = hugepages_thp_mode_not_supported
 #if USE_TCACHE
   ,
   .tcache_count = TCACHE_FILL_COUNT,
@@ -1901,14 +1901,15 @@ free_perturb (char *p, size_t n)
 static __always_inline void
 thp_init (void)
 {
-  /* Initialize only once if DEFAULT_THP_PAGESIZE is defined.  */
-  if (DEFAULT_THP_PAGESIZE == 0 || mp_.thp_mode != malloc_thp_mode_not_supported)
+  /* Initialize only once if MALLOC_DEFAULT_THP_PAGESIZE is defined.  */
+  if (MALLOC_DEFAULT_THP_PAGESIZE == 0
+        || mp_.thp_mode != hugepages_thp_mode_not_supported)
     return;
 
   /* Set thp_pagesize even if thp_mode is never.  This reduces frequency
      of MORECORE () invocation.  */
-  mp_.thp_mode = __malloc_thp_mode ();
-  mp_.thp_pagesize = DEFAULT_THP_PAGESIZE;
+  mp_.thp_mode = __hugepages_thp_mode ();
+  mp_.thp_pagesize = MALLOC_DEFAULT_THP_PAGESIZE;
 }
 
 static inline void
@@ -1920,7 +1921,7 @@ madvise_thp (void *p, INTERNAL_SIZE_T size)
 
   /* Only use __madvise if the system is using 'madvise' mode and the size
      is at least a huge page, otherwise the call is wasteful. */
-  if (mp_.thp_mode != malloc_thp_mode_madvise || size < mp_.thp_pagesize)
+  if (mp_.thp_mode != hugepages_thp_mode_madvise || size < mp_.thp_pagesize)
     return;
 
   /* Linux requires the input address to be page-aligned, and unaligned
@@ -5064,12 +5065,12 @@ static __always_inline int
 do_set_hugetlb (size_t value)
 {
   if (value == 0)
-    mp_.thp_mode = malloc_thp_mode_never;
+    mp_.thp_mode = hugepages_thp_mode_never;
   else if (value == 1)
     {
-      mp_.thp_mode = __malloc_thp_mode ();
-      if (mp_.thp_mode == malloc_thp_mode_madvise
-          || mp_.thp_mode == malloc_thp_mode_always)
+      mp_.thp_mode = __hugepages_thp_mode ();
+      if (mp_.thp_mode == hugepages_thp_mode_madvise
+          || mp_.thp_mode == hugepages_thp_mode_always)
 	mp_.thp_pagesize = __malloc_default_thp_pagesize ();
     }
   else if (value >= 2)

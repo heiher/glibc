@@ -20,19 +20,10 @@
 #define _MALLOC_HUGEPAGES_H
 
 #include <stddef.h>
+#include <hugepages.h>
 
 /* Return the default transparent huge page size.  */
 unsigned long int __malloc_default_thp_pagesize (void) attribute_hidden;
-
-enum malloc_thp_mode_t
-{
-  malloc_thp_mode_always,
-  malloc_thp_mode_madvise,
-  malloc_thp_mode_never,
-  malloc_thp_mode_not_supported
-};
-
-enum malloc_thp_mode_t __malloc_thp_mode (void) attribute_hidden;
 
 /* Return the supported huge page size from the REQUESTED sizes on PAGESIZE
    along with the required extra mmap flags on FLAGS,  Requesting the value
@@ -41,8 +32,8 @@ enum malloc_thp_mode_t __malloc_thp_mode (void) attribute_hidden;
 void __malloc_hugepage_config (size_t requested, size_t *pagesize, int *flags)
      attribute_hidden;
 
-#ifndef DEFAULT_THP_PAGESIZE
-# define DEFAULT_THP_PAGESIZE	0
+#ifndef MALLOC_DEFAULT_THP_PAGESIZE
+# define MALLOC_DEFAULT_THP_PAGESIZE	0
 #endif
 
 #endif /* _MALLOC_HUGEPAGES_H */
